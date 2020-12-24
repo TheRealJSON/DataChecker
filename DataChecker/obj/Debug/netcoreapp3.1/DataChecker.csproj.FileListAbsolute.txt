@@ -1,0 +1,13 @@
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\bin\Debug\netcoreapp3.1\DataChecker.exe
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\bin\Debug\netcoreapp3.1\DataChecker.deps.json
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\bin\Debug\netcoreapp3.1\DataChecker.runtimeconfig.json
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\bin\Debug\netcoreapp3.1\DataChecker.runtimeconfig.dev.json
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\bin\Debug\netcoreapp3.1\DataChecker.dll
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\bin\Debug\netcoreapp3.1\DataChecker.pdb
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.csprojAssemblyReference.cache
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.AssemblyInfoInputs.cache
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.AssemblyInfo.cs
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.csproj.CoreCompileInputs.cache
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.dll
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.pdb
+C:\Users\Jaso\source\repos\DataChecker\DataChecker\obj\Debug\netcoreapp3.1\DataChecker.genruntimeconfig.cache

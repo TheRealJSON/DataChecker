@@ -1,0 +1,4 @@
+C:\Users\Jaso\source\repos\DataChecker\DataCheckerTest\obj\Debug\netcoreapp3.1\DataCheckerTest.csprojAssemblyReference.cache
+C:\Users\Jaso\source\repos\DataChecker\DataCheckerTest\obj\Debug\netcoreapp3.1\DataCheckerTest.AssemblyInfoInputs.cache
+C:\Users\Jaso\source\repos\DataChecker\DataCheckerTest\obj\Debug\netcoreapp3.1\DataCheckerTest.AssemblyInfo.cs
+C:\Users\Jaso\source\repos\DataChecker\DataCheckerTest\obj\Debug\netcoreapp3.1\DataCheckerTest.csproj.CoreCompileInputs.cache
