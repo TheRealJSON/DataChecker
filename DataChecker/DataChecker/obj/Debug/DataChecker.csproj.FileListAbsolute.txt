@@ -1,7 +1,0 @@
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\bin\Debug\DataChecker.exe.config
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\bin\Debug\DataChecker.exe
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\bin\Debug\DataChecker.pdb
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\obj\Debug\DataChecker.csprojAssemblyReference.cache
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\obj\Debug\DataChecker.csproj.CoreCompileInputs.cache
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\obj\Debug\DataChecker.exe
-C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataChecker\obj\Debug\DataChecker.pdb
