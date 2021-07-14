@@ -25,7 +25,19 @@ namespace DataCheckerProj.Importers
 
         #region methods
 
+        protected override void ValidateConstructorArguments(IDbConnection importConnection, string importQuery)
+        {
+            base.ValidateConstructorArguments(importConnection, importQuery);
 
+            if (importConnection.GetType() != typeof(SqlConnection))
+            {
+                if (importConnection.GetType().ToString() != "Castle.Proxies.IDbConnectionProxy") // Rough solution to unit testing problem: dont error when Mock is passed
+                {
+                    string msg = "Provided importConnection must be of type SqlConnection. Actual type is " + importConnection.GetType();
+                    throw new ArgumentException(msg);
+                }
+            }
+        }
 
         #endregion
     }

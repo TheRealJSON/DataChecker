@@ -24,6 +24,8 @@ namespace DataCheckerProj.Importers
 
         protected SqlDataImporter(IDbConnection importConnection, string importQuery)
         {
+            ValidateConstructorArguments(importConnection, importQuery); // throws exception if invalid
+
             this.DbConnection = importConnection;
 
             InitialiseDataReader(importQuery);
@@ -34,8 +36,28 @@ namespace DataCheckerProj.Importers
 
         #region methods
 
+        protected virtual void ValidateConstructorArguments(IDbConnection importConnection, string importQuery)
+        {
+            if (String.IsNullOrEmpty(importQuery))
+            {
+                string msg = "Provided importQuery has null or empty value. A query must be provided for importing data.";
+                throw new ArgumentException(msg);
+            }
+            else if (String.IsNullOrEmpty(importConnection.ConnectionString))
+            {
+                string msg = "Provided DbConnection has null or empty connection string.";
+                throw new ArgumentException(msg);
+            }
+        }
+
         private void InitialiseDataReader(string importQuery)
         {
+            if (this.DbConnection == null)
+                throw new ArgumentException("DbConnection must be instantiated before calling InitialiseDataReader(importQuery).");
+
+            if (this.DbConnection.State != ConnectionState.Open)
+                this.DbConnection.Open();
+
             using (IDbCommand command = this.DbConnection.CreateCommand())
             {
                 command.CommandTimeout = 1200;
@@ -47,6 +69,11 @@ namespace DataCheckerProj.Importers
 
         private void InitialiseDataSegment()
         {
+            if (this.DataReader == null)
+            {
+                throw new ArgumentException("SqlDataImporter.DataReader is null. Make sure the reader is initialised before the data segment.");
+            }
+
             /* Get table definition dynamically */
             string colName = "";
             Type colType = null;
