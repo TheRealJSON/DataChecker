@@ -117,6 +117,21 @@ namespace DataCheckerProj.Importers
             return this.DataSegment;
         }
 
+        public IDataReader GetDataReader()
+        {
+            return this.DataReader;
+        }
+
+        public IDbConnection GetDbConnection()
+        {
+            return this.DbConnection;
+        }
+
+        public virtual DataTable GetDataSegment() // used for testing/mocking
+        {
+            return this.DataSegment;
+        }
+
         public void Dispose()
         {
             if (this.DataReader != null)

@@ -15,3 +15,11 @@ C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataCheck
 C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\obj\Debug\DataCheckerTest.csproj.CopyComplete
 C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\obj\Debug\DataCheckerTest.dll
 C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\obj\Debug\DataCheckerTest.pdb
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\Castle.Core.dll
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\Moq.dll
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\Castle.Core.xml
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\Moq.xml
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Jaso\Documents\FUCKING FINAL PROJECT SHIT FUCK\Git_Repository\DataChecker_Corrected\DataChecker\DataChecker\DataCheckerTest\bin\Debug\System.Threading.Tasks.Extensions.xml

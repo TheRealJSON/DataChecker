@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ErrorHandling\LogWriter.cs" />
+    <Compile Include="Importers\SqlDataImporter.cs" />
+    <Compile Include="Importers\SqlServerImporter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
