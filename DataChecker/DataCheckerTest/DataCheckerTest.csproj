@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="ErrorHandling\LogWriter.cs" />
     <Compile Include="Importers\SqlServerImporterTest.cs" />
+    <Compile Include="Mapping\TableMappingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
