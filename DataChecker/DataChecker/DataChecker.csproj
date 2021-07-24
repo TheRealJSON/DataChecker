@@ -43,13 +43,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ErrorHandling\LogWriter.cs" />
+    <Compile Include="Importers\PostgreSqlImporter.cs" />
     <Compile Include="Importers\SqlDataImporter.cs" />
     <Compile Include="Importers\SqlServerImporter.cs" />
     <Compile Include="Mapping\ColumnMapping.cs" />
     <Compile Include="Mapping\TableMapping.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sampling\DataSampler.cs" />
     <Compile Include="Sampling\IDataSamplingStrategy.cs" />
+    <Compile Include="Sampling\SequentialDataSampler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

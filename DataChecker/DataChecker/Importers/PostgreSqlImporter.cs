@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Odbc;
 
 namespace DataCheckerProj.Importers
 {
-
-    public class SqlServerImporter : SqlDataImporter
+    public class PostgreSqlImporter : SqlDataImporter
     {
         #region properties
 
         #endregion
 
-        #region constructors
+        #region Constructors
 
-        public SqlServerImporter(IDbConnection importConnection, string importQuery) : base(importConnection, importQuery)
+        public PostgreSqlImporter(IDbConnection importConnection, string importQuery) : base(importConnection, importQuery)
         {
             // work done in base
         }
 
         #endregion
 
-        #region methods
+        #region Methods
 
         protected override void ValidateConstructorArguments(IDbConnection importConnection, string importQuery)
         {
             base.ValidateConstructorArguments(importConnection, importQuery);
 
-            if (importConnection.GetType() != typeof(SqlConnection))
+            if (importConnection.GetType() != typeof(OdbcConnection))
             {
                 if (importConnection.GetType().ToString() != "Castle.Proxies.IDbConnectionProxy") // Rough solution to unit testing problem: dont error when Mock is passed
                 {
