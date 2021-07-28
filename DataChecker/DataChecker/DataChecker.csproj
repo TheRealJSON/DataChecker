@@ -43,6 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ErrorHandling\LogWriter.cs" />
+    <Compile Include="Helpers\QueryBuilders\PostgreSqlQueryBuilder.cs" />
+    <Compile Include="Helpers\QueryBuilders\SqlQueryBuilder.cs" />
+    <Compile Include="Helpers\QueryBuilders\SqlServerQueryBuilder.cs" />
     <Compile Include="Importers\PostgreSqlImporter.cs" />
     <Compile Include="Importers\SqlDataImporter.cs" />
     <Compile Include="Importers\SqlServerImporter.cs" />
