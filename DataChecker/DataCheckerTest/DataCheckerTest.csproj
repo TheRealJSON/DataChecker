@@ -66,8 +66,10 @@
   <ItemGroup>
     <Compile Include="ErrorHandling\LogWriter.cs" />
     <Compile Include="Importers\SqlServerImporterTest.cs" />
+    <Compile Include="Mapping\ColumnMappingTest.cs" />
     <Compile Include="Mapping\TableMappingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sampling\SequentialDataSamplerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
