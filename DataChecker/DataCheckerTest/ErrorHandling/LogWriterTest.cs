@@ -6,7 +6,7 @@ using System;
 namespace DataCheckerTest.ErrorHandling
 {
     [TestClass]
-    public class LogWriterClassTest
+    public class LogWriterTest
     {
         private bool deleteLogFile = true; // just in case log file already exists in file system and shouldnt be deleted
         private string logFile;
