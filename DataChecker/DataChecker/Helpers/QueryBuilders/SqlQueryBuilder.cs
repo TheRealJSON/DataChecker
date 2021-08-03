@@ -46,9 +46,9 @@ namespace DataCheckerProj.Helpers
 
         public SqlQueryBuilder From(TableReference table)
         {
-            this.SelectQuery += $" FROM {this.IdentifierStart}{table.DatabaseName}{this.IdentifierEnd}"
-                                  + $".{this.IdentifierStart}{table.SchemaName}{this.IdentifierEnd}"
-                                  + $".{this.IdentifierStart}{table.TableName}{this.IdentifierEnd}";
+            this.SelectQuery += " FROM " + this.IdentifierStart + table.DatabaseName + this.IdentifierEnd
+                                + "." + this.IdentifierStart + table.SchemaName + this.IdentifierEnd
+                                + "." + this.IdentifierStart + table.TableName + this.IdentifierEnd;
 
             return this;
         }
@@ -59,9 +59,10 @@ namespace DataCheckerProj.Helpers
             if (this.SelectQuery.Contains("WHERE")) // this is not good way of doing it. What is Schema is called "WHERE"? CHANGE.
                 joiningClause = " AND ";
 
-            this.SelectQuery += $"{joiningClause} {this.IdentifierStart}{whereCondition.ColumnName}{this.IdentifierEnd} "
-                             + $"{whereCondition.Operation} "
-                             + $"{TranslateValueToSQL(whereCondition.Value)}";
+            this.SelectQuery = joiningClause + " " 
+                                + this.IdentifierStart + whereCondition.ColumnName + this.IdentifierEnd
+                                + " " + whereCondition.Operation 
+                                + " " + TranslateValueToSQL(whereCondition.Value);
 
             return this;
         }
