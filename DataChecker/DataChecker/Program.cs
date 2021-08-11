@@ -1,4 +1,5 @@
-﻿using DataCheckerProj.Helpers;
+﻿using DataCheckerProj.ErrorHandling;
+using DataCheckerProj.Helpers;
 using DataCheckerProj.Importers;
 using DataCheckerProj.Mapping;
 using System;
@@ -26,7 +27,24 @@ namespace DataCheckerProj
 
             if (initialisationSuccess)
             {
-                // do the data checking
+                foreach (TableMapping tableMappingToVerify in TableMappingList)
+                {
+                    string sourceTableBeingVerified = tableMappingToVerify.GetSourceTableReferenceForFilePath(); // used for reporting/log writing
+
+                    try
+                    {
+                        DataChecker checker = new DataChecker(tableMappingToVerify, PostgresqlConnectionString, LogFileFolderPath); // this class uses passed mapping info to cross-verify data between schemas
+
+                        bool problemsFound = checker.VerifyDataMatchesBetweenSourceAndDestination(); // verifies no data elements are missing between source and destination schema
+
+                        if (problemsFound) // specifics of problems should be reported by checker class
+                            Dts.Events.FireError(0, "Main(string[] args)", "Process found discrepencies between source and destination data for source table " + sourceTableBeingVerified, String.Empty, 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogWriter.LogError("Main(string[] args)", sourceTableBeingVerified, ex.ToString(), "no data description available", LogFileFolderPath); // can use LogWriter because initialisationSuccess=true :D
+                    }
+                }
             }
             else
             {
