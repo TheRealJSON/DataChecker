@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace DataCheckerProj.Helpers
 {
+    /// <summary>
+    ///     Class used to construct SQL queries in the correct syntax.
+    /// </summary>
     public abstract class SqlQueryBuilder
     {
         #region properties
@@ -24,6 +27,11 @@ namespace DataCheckerProj.Helpers
 
         #region methods
 
+        /// <summary>
+        ///    Construct the SQL SELECT FROM clause for the current query, by selecting all columns of the specified SQL table.
+        /// </summary>
+        /// <param name="table">The SQL table that all columns should be selected/queried from.</param>
+        /// <returns>Current Class instance.</returns>
         public SqlQueryBuilder SelectAllFrom(TableReference table)
         {
             this.SelectQuery = "SELECT *";
@@ -32,6 +40,12 @@ namespace DataCheckerProj.Helpers
             return this;
         }
 
+        /// <summary>
+        ///    Construct the SQL SELECT clause for the current query, by selecting only specified columns.
+        /// </summary>
+        /// <param name="columns">The columns to include in the SQL SELECT clause.</param>
+        /// <param name="distinct">Whether or not to only select distinct (unique) values.</param>
+        /// <returns>Current Class instance.</returns>
         public SqlQueryBuilder Select(List<string> columns, bool distinct = false)
         {
             this.SelectQuery = "SELECT ";
@@ -44,6 +58,11 @@ namespace DataCheckerProj.Helpers
             return this;
         }
 
+        /// <summary>
+        ///    Construct the SQL FROM clause for the current query.
+        /// </summary>
+        /// <param name="table">The SQL table to be queried.</param>
+        /// <returns>Current Class instance.</returns>
         public SqlQueryBuilder From(TableReference table)
         {
             this.SelectQuery += " FROM " + this.IdentifierStart + table.DatabaseName + this.IdentifierEnd
@@ -53,6 +72,11 @@ namespace DataCheckerProj.Helpers
             return this;
         }
 
+        /// <summary>
+        ///    Construct the SQL WHERE clause for the current query.
+        /// </summary>
+        /// <param name="whereCondition">The SQL condition to applied to the current query.</param>
+        /// <returns>Current Class instance.</returns>
         public SqlQueryBuilder Where(Condition whereCondition)
         {
             string joiningClause = " WHERE ";
@@ -67,6 +91,11 @@ namespace DataCheckerProj.Helpers
             return this;
         }
 
+        /// <summary>
+        ///    Construct the SQL ORDER BY clause for the current query.
+        /// </summary>
+        /// <param name="columnsToOrderBy">The list of columns to order the current query results by.</param>
+        /// <returns>Current Class instance.</returns>
         public SqlQueryBuilder OrderBy(List<string> columnsToOrderBy)
         {
             string orderByClause = " ORDER BY ";
@@ -82,6 +111,11 @@ namespace DataCheckerProj.Helpers
             return this;
         }
 
+        /// <summary>
+        ///    Convert a value to a syntax that can be parsed in a SQL query.
+        /// </summary>
+        /// <param name="value">The value to be parsed in a sql query.</param>
+        /// <returns>String containing the provided value in a syntax that can be parsed in a SQL query.</returns>
         public string TranslateValueToSQL(dynamic value)
         {
             // would use switch case, but not easy to do prior to c# 7 apparently
@@ -106,6 +140,11 @@ namespace DataCheckerProj.Helpers
             return Convert.ToString(value);
         }
 
+        /// <summary>
+        ///    Returns the SQL query that has been constructed over the lifetime of the current object by 
+        ///    successive method calls.
+        /// </summary>
+        /// <returns>SQL query constructed over the lifetime of the current object</returns>
         public string GetSelectQuery()
         {
             return this.SelectQuery;
@@ -113,6 +152,9 @@ namespace DataCheckerProj.Helpers
 
         #endregion
 
+        /// <summary>
+        ///    A class used to conceptually represent a SQL table.
+        /// </summary>
         public class TableReference
         {
             public string DatabaseName { get; set; }
@@ -131,6 +173,9 @@ namespace DataCheckerProj.Helpers
             }
         }
 
+        /// <summary>
+        ///    A class used to conceptually represent a SQL WHERE condition.
+        /// </summary>
         public class Condition
         {
             public string ColumnName { get; set; }

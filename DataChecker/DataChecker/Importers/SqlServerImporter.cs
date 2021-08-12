@@ -4,7 +4,9 @@ using System.Data.SqlClient;
 
 namespace DataCheckerProj.Importers
 {
-
+    /// <summary>
+    /// Class used to read data from a SQL Server data source
+    /// </summary>
     public class SqlServerImporter : SqlDataImporter
     {
         #region properties
@@ -12,7 +14,16 @@ namespace DataCheckerProj.Importers
         #endregion
 
         #region constructors
+        public SqlServerImporter() : base()
+        {
+            // used for mocking
+        }
 
+        /// <summary>
+        /// Construct a SqlServerImporter object.
+        /// </summary>
+        /// <param name="importConnection">The database connection needed to connect to and therefore read data from the data source.</param>
+        /// <param name="importQuery">The SQL query to be used to read data from the database.</param>
         public SqlServerImporter(IDbConnection importConnection, string importQuery) : base(importConnection, importQuery)
         {
             // work done in base
@@ -22,6 +33,11 @@ namespace DataCheckerProj.Importers
 
         #region methods
 
+        /// <summary>
+        /// Verifies that constructor arguments follow an expected format i.e. the connection is of the correct type. 
+        /// </summary>
+        /// <param name="importConnection">The database connection needed to connect to and therefore read data from the data source.</param>
+        /// <param name="importQuery">The SQL query to be used to read data from the database.</param>
         protected override void ValidateConstructorArguments(IDbConnection importConnection, string importQuery)
         {
             base.ValidateConstructorArguments(importConnection, importQuery);

@@ -2,6 +2,9 @@
 
 namespace DataCheckerProj.Mapping
 {
+    /// <summary>
+    /// Class used to store column mapping information (schema mapping).
+    /// </summary>
     public class ColumnMapping
     {
         #region properties
@@ -14,6 +17,18 @@ namespace DataCheckerProj.Mapping
         public List<string> DecommissionedClasses { get; set; } // values for this column that constitute a class that should no longer be sampled
         #endregion
 
+        /// <summary>
+        /// Construct a ColumnMapping object.
+        /// </summary>
+        /// <param name="id">The integer that uniquely identifies the ColumnMapping</param>
+        /// <param name="srcCol">The name of the source column being mapped to another column</param>
+        /// <param name="srcType">The type of the source column being mapped to another column</param>
+        /// <param name="dstCol">The name of the destination column that a source column is mapped to</param>
+        /// <param name="dstType">The type of the destination column that a source column is mapped to</param>
+        /// <param name="isIdentity">
+        ///     Whether or not the column mapping is for a column that, 
+        ///     at least partially, uniquely identifies a data element (record)
+        /// </param>
         public ColumnMapping(int id, string srcCol, string srcType, string dstCol, string dstType, bool isIdentity)
         {
             this.MappingID = id;

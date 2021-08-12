@@ -7,6 +7,9 @@ using System.Data;
 
 namespace DataCheckerProj.Mapping
 {
+    /// <summary>
+    /// Class used to store table mapping information (schema mapping).
+    /// </summary>
     public class TableMapping
     {
         #region properties
@@ -23,6 +26,9 @@ namespace DataCheckerProj.Mapping
 
         #region constructors
 
+        /// <summary>
+        /// Construct an empty TableMapping object. Expectation is that other methods are used to populate the object with data.
+        /// </summary>
         public TableMapping()
         {
             this.MappedColumns = new List<ColumnMapping>();
@@ -32,6 +38,15 @@ namespace DataCheckerProj.Mapping
 
         #region methods
 
+        /// <summary>
+        /// Load mapping data from a SQL server data source and populate object properties with it.
+        /// </summary>
+        /// <param name="mappingImporter">Data importation object used to read mapping data from the data source.</param>
+        /// <param name="propertyToSourceAttributeMap">Dictionary that maps class property names to source attribute names (as returned by <c>mappingImporter</c> object.</param>
+        /// <exception cref="ArgumentException">Throws exception if mappingImporter parameter is not instantiated/is null</exception>
+        /// <exception cref="ArgumentException">Throws exception if propertyToSourceAttributeMap parameter is not instantiated/is null</exception>
+        /// <exception cref="ArgumentException">Throws exception if propertyToSourceAttributeMap parameter does not contain a dictionary entry for all non-list class properties</exception>
+        /// <exception cref="ArgumentException">Throws exception if propertyToSourceAttributeMap parameter does not contain a dictionary entry for 1 or more of the source attributes returned by <c>mappingImporter</c></exception>
         public void LoadMappingFromSqlServerDatabase(SqlServerImporter mappingImporter, Dictionary<string, string> propertyToSourceAttributeMap)
         {
             //TODO: maybe add some verification for structure of results returned by importer
@@ -107,6 +122,10 @@ namespace DataCheckerProj.Mapping
             }
         }
 
+        /// <summary>
+        /// Evaluates object state (property values etc.) to determine if it constitutes a valid TableMapping object.
+        /// </summary>
+        /// <returns>Whether or not object state is valid.</returns>
         public bool Validate()
         {
             bool isValid = true;
@@ -136,6 +155,10 @@ namespace DataCheckerProj.Mapping
             return isValid;
         }
 
+        /// <summary>
+        /// Returns the source table reference in a format that can be added to a file path.
+        /// </summary>
+        /// <returns>source table reference in a format that can be added to a file path</returns>
         public string GetSourceTableReferenceForFilePath()
         {
             return this.SourceSchemaName + "-" + this.SourceTableName; // "-" because . might cause issues

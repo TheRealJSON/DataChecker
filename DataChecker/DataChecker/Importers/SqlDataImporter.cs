@@ -3,6 +3,9 @@ using System;
 
 namespace DataCheckerProj.Importers
 {
+    /// <summary>
+    /// Class used to read data from a generic SQL datasource data source
+    /// </summary>
     public abstract class SqlDataImporter : IDisposable
     {
 
@@ -12,7 +15,6 @@ namespace DataCheckerProj.Importers
         protected IDataReader DataReader;       // Used to import data via the DbConnection
         protected DataTable DataSegment;        // Stores the last segment/sample/chunk of data that has been imported
 
-        protected bool Disposed = false;
         #endregion
 
         #region constructors
@@ -22,6 +24,11 @@ namespace DataCheckerProj.Importers
             DataSegment = null;
         }
 
+        /// <summary>
+        /// Construct a SqlDataImporter object.
+        /// </summary>
+        /// <param name="importConnection">The database connection needed to connect to and therefore read data from the data source.</param>
+        /// <param name="importQuery">The SQL query to be used to read data from the database.</param>
         protected SqlDataImporter(IDbConnection importConnection, string importQuery)
         {
             ValidateConstructorArguments(importConnection, importQuery); // throws exception if invalid
@@ -36,6 +43,11 @@ namespace DataCheckerProj.Importers
 
         #region methods
 
+        /// <summary>
+        /// Verifies that constructor arguments follow an expected format i.e. import query is not empty
+        /// </summary>
+        /// <param name="importConnection">The database connection needed to connect to and therefore read data from the data source.</param>
+        /// <param name="importQuery">The SQL query to be used to read data from the database.</param>
         protected virtual void ValidateConstructorArguments(IDbConnection importConnection, string importQuery)
         {
             if (String.IsNullOrEmpty(importQuery))
@@ -50,6 +62,11 @@ namespace DataCheckerProj.Importers
             }
         }
 
+        /// <summary>
+        /// Initialises/bootstraps the <c>DataReader</c> property used to import data using the provided SQL query and the <c>DbConnection</c> property.  
+        /// </summary>
+        /// <param name="importQuery">The SQL query to be used to read data from the database.</param>
+        /// <exception cref="ArgumentException">Throws exception if DBConnection is not instantiated.</exceptioon>
         private void InitialiseDataReader(string importQuery)
         {
             if (this.DbConnection == null)
@@ -67,6 +84,11 @@ namespace DataCheckerProj.Importers
             }
         }
 
+        /// <summary>
+        /// Initialises/bootstraps the <c>DataTable DataSegment</c> property by using the the <c>DataReader</c> property's
+        /// runtime query results to determine required table structure.
+        /// </summary>
+        /// <exception cref="ArgumentException">If required <c>DataReader</c> property is not instantiated.</exception>
         private void InitialiseDataSegment()
         {
             if (this.DataReader == null)
@@ -93,6 +115,12 @@ namespace DataCheckerProj.Importers
             this.DataSegment = dt; // finalise
         }
 
+        /// <summary>
+        /// Reads the next series of query results from the data source into the <c>DataSegment</c> DataTable property.
+        /// Data previously stored in the <c>DataSegment</c> are lost/overwritten.
+        /// </summary>
+        /// <param name="rowLimit">The maximum number of records/DataRows to read.</param>
+        /// <return>Returns <c>DataSegment</c> property of object that has just been filled with data.</return>
         public virtual DataTable NextDataSegment(int rowLimit)
         {
             if (this.DbConnection.State != ConnectionState.Open)
@@ -117,21 +145,36 @@ namespace DataCheckerProj.Importers
             return this.DataSegment;
         }
 
+        /// <summary>
+        /// DataReader Getter.
+        /// </summary>
+        /// <return><c>DataReader</c> property.</return>
         public IDataReader GetDataReader()
         {
             return this.DataReader;
         }
 
+        /// <summary>
+        /// DbConnection Getter.
+        /// </summary>
+        /// <return><c>DbConnection</c> property.</return>
         public IDbConnection GetDbConnection()
         {
             return this.DbConnection;
         }
 
+        /// <summary>
+        /// DataSegment Getter.
+        /// </summary>
+        /// <return><c>DataSegment</c> property.</return>
         public virtual DataTable GetDataSegment() // used for testing/mocking
         {
             return this.DataSegment;
         }
 
+        /// <summary>
+        /// Deallocates properties, closes connections etc. 
+        /// </summary>
         public void Dispose()
         {
             if (this.DataReader != null)

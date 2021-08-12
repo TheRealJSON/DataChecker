@@ -52,6 +52,12 @@ namespace DataCheckerProj
             }
         }
 
+        /// <summary>
+        /// Loads user parameters, loads table and attribute mappings, 
+        /// loads record classes to exclude from processing (Decommissioned).
+        /// Bootstraps initial state needed before processing begins. 
+        /// </summary>
+        /// <returns>success true/false</returns>
         private static bool Initialise()
         {
             bool initialiseSuccess = false;
@@ -101,6 +107,10 @@ namespace DataCheckerProj
             return initialiseSuccess;
         }
 
+        /// <summary>
+        /// Reads user-input parameters and saves their values to fields.
+        /// </summary>
+        /// <returns>success true/false</returns>
         private static bool LoadParameters()
         {
             bool success;
@@ -141,6 +151,12 @@ namespace DataCheckerProj
             return success;
         }
 
+        /// <summary>
+        /// Reads the table attribute mappings essential for processing.
+        /// Uses a data source that should be provided by user via parameters. 
+        /// Uses a variety of configurations. 
+        /// </summary>
+        /// <returns>success true/false</returns>
         public static bool LoadAllMappings()
         {
             bool loadMappingsSuccess = false;
@@ -178,6 +194,19 @@ namespace DataCheckerProj
             return loadMappingsSuccess;
         }
 
+        /// <summary>
+        /// Reads mapping data for a specified table from a specified SQL table source
+        /// and saves the results to a class property for later processing. 
+        /// Only a single table mapping (TableMapping.cs) is loaded, therefore, the details 
+        /// needed to uniquely identify the table mapping must be specified via the parameters. 
+        /// </summary>
+        /// <param name="tableMappingSource">SQL table data source</param>
+        /// <param name="mappingPropertyToSourceAttributeMap">Map of the Class property names to their corresponding source attribute names</param>
+        /// <param name="mappingToLoadSourceSchema">The source schema specified by the mapping records to read</param>
+        /// <param name="mappingToLoadSourceTable">The source table specified by the mapping records to read</param>
+        /// <param name="mappingToLoadDestSchema">The destination schema specified by the mapping records to read</param>
+        /// <param name="mappingToLoadDestTable">The destination table specified by the mapping records to read</param>
+        /// <returns>success true/false</returns>
         private static bool LoadTableMapping(TableReference tableMappingSource, Dictionary<string, string> mappingPropertyToSourceAttributeMap, string mappingToLoadSourceSchema, string mappingToLoadSourceTable, string mappingToLoadDestSchema, string mappingToLoadDestTable)
         {
             bool success = false;
@@ -232,6 +261,11 @@ namespace DataCheckerProj
             return success;
         }
 
+        /// <summary>
+        /// Reads the configuration for record classes/types that should be omitted from processing/checks. 
+        /// If a record has a specified value in a specified column, as defined by the configuration, then it will be ignored. 
+        /// </summary>
+        /// <returns>success true/false</returns>
         private static bool LoadDecommissionedRecordClasses()
         {
             bool success = false;
@@ -284,6 +318,13 @@ namespace DataCheckerProj
             return success;
         }
 
+        /// <summary>
+        /// Creates a Dictionary that maps "Mapping" class property names to their corresponding data source attribute names
+        /// so that source attribute values can be mapped to the correct properties.
+        /// 
+        /// Currently redundant, all done in code, mostly a placeholder method. Configuration of this is not a current need.
+        /// </summary>
+        /// <returns>Dictionary mapping property names to data source attribute names</returns>
         private static Dictionary<string, string> LoadMappingPropertyToSourceAttributeMapFromConfig()
         {
             // atm hardcoded because ability to configure is unecessary
@@ -305,6 +346,14 @@ namespace DataCheckerProj
             return propertyToSourceAttributeMap;
         }
 
+        /// <summary>
+        /// Returns a list of Dictionaries where each Dictionary has entries for attributes that uniquely identify a Table Mapping.
+        /// Each unique TableMapping identity that is represented in the return object is for a mapping that should be processed.
+        /// Largely redundant in its current incarnation, partially a placeholder.
+        /// </summary>
+        /// <param name="mappingDataSource"></param>
+        /// <param name="mappingPropertyToSourceAttributeMap"></param>
+        /// <returns>List of dictionaires that uniquely identify Table Mappings to process</returns>
         private static List<Dictionary<string, string>> LoadMappingsToVerifyFromConfig(TableReference mappingDataSource, Dictionary<string, string> mappingPropertyToSourceAttributeMap)
         {
             /* build query that gets a list of table mappings that need verifying */
