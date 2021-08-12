@@ -18,7 +18,7 @@ namespace DataCheckerProj.Helpers
 
         #region constructors
 
-        public SqlQueryBuilder()
+        protected SqlQueryBuilder()
         {
             this.SelectQuery = "";
         }

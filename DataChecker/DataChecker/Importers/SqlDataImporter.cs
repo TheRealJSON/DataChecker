@@ -15,6 +15,7 @@ namespace DataCheckerProj.Importers
         protected IDataReader DataReader;       // Used to import data via the DbConnection
         protected DataTable DataSegment;        // Stores the last segment/sample/chunk of data that has been imported
 
+        protected bool Disposed = false;
         #endregion
 
         #region constructors
@@ -177,14 +178,49 @@ namespace DataCheckerProj.Importers
         /// </summary>
         public void Dispose()
         {
-            if (this.DataReader != null)
-                this.DataReader.Close();
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
 
-            if (this.DbConnection != null)
-                this.DbConnection.Close();
+        /// <summary>
+        /// If disposing equals true, the method has been called directly
+        /// or indirectly by a user's code. Managed and unmanaged resources
+        /// can be disposed.
+        /// If disposing equals false, the method has been called by the
+        /// runtime from inside the finalizer and you should not reference
+        /// other objects. Only unmanaged resources can be disposed.
+        /// </summary>
+        /// <param name="disposing">Whether or not the object is being disposed of.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this.Disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    if (this.DataReader != null)
+                        this.DataReader.Close();
 
-            this.DataReader = null;
-            this.DbConnection = null;
+                    if (this.DbConnection != null)
+                        this.DbConnection.Close();
+
+                    this.DataReader = null;
+                    this.DbConnection = null;
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+
+                // Note disposing has been done.
+                Disposed = true;
+            }
         }
 
         #endregion

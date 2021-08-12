@@ -15,8 +15,6 @@
         {
             this.IdentifierStart = "\"";
             this.IdentifierEnd = "\"";
-            //this.IdentifierStart = "";
-            //this.IdentifierEnd = "";
         }
 
         #endregion
