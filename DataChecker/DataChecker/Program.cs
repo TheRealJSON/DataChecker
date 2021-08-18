@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using static DataCheckerProj.Helpers.SqlQueryBuilder;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace DataCheckerProj
 {
@@ -27,9 +29,9 @@ namespace DataCheckerProj
 
             if (initialisationSuccess)
             {
-                foreach (TableMapping tableMappingToVerify in TableMappingList)
+                Parallel.ForEach(Partitioner.Create(TableMappingList), new ParallelOptions { MaxDegreeOfParallelism = 8 }, (tableMappingToVerify) => // process tables in parallel
                 {
-                    string sourceTableBeingVerified = tableMappingToVerify.GetSourceTableReferenceForFilePath(); // used for reporting/log writing
+                    string mappingBeingVerified = tableMappingToVerify.ToString(); // used for reporting/log writing
 
                     try
                     {
@@ -38,13 +40,13 @@ namespace DataCheckerProj
                         bool problemsFound = checker.VerifyDataMatchesBetweenSourceAndDestination(); // verifies no data elements are missing between source and destination schema
 
                         if (problemsFound) // specifics of problems should be reported by checker class
-                            Dts.Events.FireError(0, "Main(string[] args)", "Process found discrepencies between source and destination data for source table " + sourceTableBeingVerified, String.Empty, 0);
+                            Dts.Events.FireError(0, "Main(string[] args)", "Process found discrepencies between source and destination data for source table " + mappingBeingVerified, String.Empty, 0);
                     }
                     catch (Exception ex)
                     {
-                        LogWriter.LogError("Main(string[] args)", sourceTableBeingVerified, ex.ToString(), "no data description available", LogFileFolderPath); // can use LogWriter because initialisationSuccess=true :D
+                        LogWriter.LogError("Main(string[] args)", mappingBeingVerified, ex.ToString(), "no data description available", LogFileFolderPath); // can use LogWriter because initialisationSuccess=true :D
                     }
-                }
+                }); // End of parallel foreach
             }
             else
             {

@@ -153,12 +153,11 @@ namespace DataCheckerProj
         /// <param name="sourceIdentityColNames">The names of the identity columns in the context of the source table</param>
         private void ReportMissingRecords(DataTable missingDestinationRecords, List<string> sourceIdentityColNames)
         {
-            string sourceTableBeingVerified = MappingToBeChecked.GetSourceTableReferenceForFilePath();
-            string mappingInfo = sourceTableBeingVerified.Replace("-", ".") + " to " + MappingToBeChecked.DestinationSchemaName + "." + MappingToBeChecked.DestinationTableName;
+            string mappingBeingVerified = MappingToBeChecked.ToString();
+            string mappingInfo = mappingBeingVerified.Replace("-", ".") + " to " + MappingToBeChecked.DestinationSchemaName + "." + MappingToBeChecked.DestinationTableName;
 
-            LogWriter.LogError("DataChecker.ReportMissingRecords()", sourceTableBeingVerified, "Some records were found to be MISSING from the destination schema!", mappingInfo, LogFileFolderPath);
+            LogWriter.LogError("DataChecker.ReportMissingRecords()", mappingBeingVerified, "Records were found to be MISSING from the destination", mappingBeingVerified, LogFileFolderPath); // a line to seperate from previous executions
 
-            // not implemented yet
             foreach (DataRow row in missingDestinationRecords.Rows)
             {
                 string recordIdentity = "";
@@ -167,7 +166,7 @@ namespace DataCheckerProj
                     recordIdentity += srcIdentityColumn + ":= " + row[srcIdentityColumn].ToString() + " ; ";
                 }
 
-                LogWriter.LogError("DataChecker.ReportMissingRecords()", sourceTableBeingVerified, recordIdentity, mappingInfo, LogFileFolderPath);
+                LogWriter.LogError("DataChecker.ReportMissingRecords()", mappingBeingVerified, "record missing from destination", recordIdentity, LogFileFolderPath);
             }
         }
 

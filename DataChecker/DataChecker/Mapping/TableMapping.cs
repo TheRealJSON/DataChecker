@@ -155,15 +155,6 @@ namespace DataCheckerProj.Mapping
             return isValid;
         }
 
-        /// <summary>
-        /// Returns the source table reference in a format that can be added to a file path.
-        /// </summary>
-        /// <returns>source table reference in a format that can be added to a file path</returns>
-        public string GetSourceTableReferenceForFilePath()
-        {
-            return this.SourceSchemaName + "-" + this.SourceTableName; // "-" because . might cause issues
-        }
-
         #endregion
     }
 }
