@@ -178,15 +178,36 @@ namespace DataCheckerProj.Helpers
         /// </summary>
         public class Condition
         {
+            public JoiningClauses JoiningClause { get; set; }
             public string ColumnName { get; set; }
             public string Operation { get; set; }
             public dynamic Value { get; set; }
+            public bool replaceNulls { get; set; }
 
-            public Condition(string column, string operation, dynamic value)
+            public enum JoiningClauses
+            {
+                WHERE,
+                AND,
+                OR,
+                NOT_STATED
+            }
+
+            public Condition(string column, string operation, dynamic value, bool shouldReplaceNulls = false)
             {
                 this.ColumnName = column;
                 this.Operation = operation;
                 this.Value = value;
+                this.JoiningClause = JoiningClauses.NOT_STATED;
+                this.replaceNulls = shouldReplaceNulls;
+            }
+
+            public Condition(string column, string operation, dynamic value, JoiningClauses joiningClause, bool shouldReplaceNulls = false)
+            {
+                this.ColumnName = column;
+                this.Operation = operation;
+                this.Value = value;
+                this.JoiningClause = joiningClause;
+                this.replaceNulls = shouldReplaceNulls;
             }
         }
     }

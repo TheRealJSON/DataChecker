@@ -122,18 +122,28 @@ namespace DataCheckerProj
         /// Get a list of <c>Conditions</c> that define classes of record to ignore based on information taken from the <c>MappingToBeChecked</c> property.
         /// </summary>
         /// <returns>A list of <c>Conditions</c> that specify column values to ignore</returns>
-        private List<Condition> GetConditionListOfClassesToIgnore()
+        private List<SqlQueryBuilder.Condition> GetConditionListOfClassesToIgnore()
         {
-            List<Condition> conditionsForClassesToIgnore = new List<Condition>();
-            foreach (ColumnMapping colMap in MappingToBeChecked.MappedColumns)
+            List<SqlQueryBuilder.Condition> sqlConditionsForClassesToIgnore = new List<SqlQueryBuilder.Condition>();
+            foreach (ColumnMapping colMap in MappingToBeChecked.MappedColumns) // for each column on the table this class is "checking"
             {
-                foreach (string decomissionedClass in colMap.DecommissionedClasses) // in Home Office context, only string/varchar fields contain classes (event_type)
-                {
-                    conditionsForClassesToIgnore.Add(new Condition(colMap.SourceColumnName, "<>", decomissionedClass));
+                // in Home Office context, only string/varchar fields contain classes (event_type)
+                foreach (string decomissionedClass in colMap.DecommissionedClasses) // for each value that should indicate a decommissioned record
+                {                                                                   // info about decommissioned classes of record should already be populated
+                    // transform current decommissioned class, as described by the TableMapping/ColumnMapping, into a Query (WHERE) Condition
+                    SqlQueryBuilder.Condition whereRecordClassIsNotDecommissioned = new SqlQueryBuilder.Condition(colMap.SourceColumnName, "<>", decomissionedClass);
+                    // add additional condition to return records when the column containing the decommissioned class IS NULL (fixes a problem with Postrgresql)
+                    //sqlConditionsForClassesToIgnore.Add(new SqlQueryBuilder.Condition(colMap.SourceColumnName, "IS", null, SqlQueryBuilder.Condition.JoiningClauses.OR));
+                    if (colMap.SourceColumnType.Equals("nvarchar")) //TODO: remove hardcoded type
+                    {
+                        whereRecordClassIsNotDecommissioned.replaceNulls = true;
+                    }
+
+                    sqlConditionsForClassesToIgnore.Add(whereRecordClassIsNotDecommissioned);
                 }
             }
 
-            return conditionsForClassesToIgnore;
+            return sqlConditionsForClassesToIgnore;
         }
 
         /// <summary>
