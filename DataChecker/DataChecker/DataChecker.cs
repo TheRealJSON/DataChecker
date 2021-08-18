@@ -65,9 +65,10 @@ namespace DataCheckerProj
             Dictionary<string, string> srcToDestIdentityColNameMap = MappingToBeChecked.MappedColumns.FindAll(c => c.IsIdentityColumn) // get all identity columns
                                                                                                      .ToDictionary(c => c.SourceColumnName, c => c.DestinationColumnName); // map Source_Col_Name to Destination_Col_Name
             List<string> srcIdentityColNames = srcToDestIdentityColNameMap.Keys.ToList();
+            string firstIdentityColName = srcIdentityColNames.First(); // Note 1 identity col name for ordering results as 2 is unecessary and has potential for causing problems
 
-            TableReference sourceSqlTableReference;
-            TableReference destinationSqlTableReference;
+            SqlQueryBuilder.TableReference sourceSqlTableReference;
+            SqlQueryBuilder.TableReference destinationSqlTableReference;
 
             DataTable sourceSample;
             DataTable destinationSample;
@@ -76,9 +77,9 @@ namespace DataCheckerProj
             Dictionary<string, dynamic> lastRecordIdentityInSample; // <Identity_Column_Name, Identity_Column_Value>
 
             /* Prepare to sample old schema */
-            sourceSqlTableReference = new TableReference(MappingToBeChecked.SourceDatabaseName, MappingToBeChecked.SourceSchemaName, MappingToBeChecked.SourceTableName);
-            List<Condition> recordClassesToIgnore = GetConditionListOfClassesToIgnore();
-            IDataSamplingStrategy sourceDataSampler = new SequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), sourceSqlTableReference, recordClassesToIgnore, srcIdentityColNames);
+            sourceSqlTableReference = new SqlQueryBuilder.TableReference(MappingToBeChecked.SourceDatabaseName, MappingToBeChecked.SourceSchemaName, MappingToBeChecked.SourceTableName);
+            List<SqlQueryBuilder.Condition> recordClassesToIgnore = GetConditionListOfClassesToIgnore();
+            IDataSamplingStrategy sourceDataSampler = new SequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), sourceSqlTableReference, recordClassesToIgnore, new List<string>() { firstIdentityColName });
 
             while (sourceDataSampler.SampleDataSource().Rows.Count > 0) // keep sampling old schema
             {
@@ -88,17 +89,18 @@ namespace DataCheckerProj
                 firstRecordIdentityInSample = new Dictionary<string, dynamic>();
                 lastRecordIdentityInSample = new Dictionary<string, dynamic>();
 
-                foreach (string srcIdentityColumnName in srcIdentityColNames) // for every identity column (source names instead of dest names because searching source sample)
-                {
-                    // add next column_name-to-column_value mapping for FIRST record. Use destination column name in mapping because record will be used to search destination.
-                    firstRecordIdentityInSample.Add(srcToDestIdentityColNameMap[srcIdentityColumnName], sourceSample.Rows[0][srcIdentityColumnName]);
-                    // add next column_name-to-column_value mapping for LAST record. Use destination column name in mapping because record will be used to search destination. 
-                    lastRecordIdentityInSample.Add(srcToDestIdentityColNameMap[srcIdentityColumnName], sourceSample.Rows[sourceSample.Rows.Count - 1][srcIdentityColumnName]);
-                }
+                // add next column_name-to-column_value mapping for FIRST record. Use destination column name in mapping because record will be used to search destination.
+                firstRecordIdentityInSample.Add(srcToDestIdentityColNameMap[firstIdentityColName], sourceSample.Rows[0][firstIdentityColName]);
+                // add next column_name-to-column_value mapping for LAST record. Use destination column name in mapping because record will be used to search destination. 
+                lastRecordIdentityInSample.Add(srcToDestIdentityColNameMap[firstIdentityColName], sourceSample.Rows[sourceSample.Rows.Count - 1][firstIdentityColName]);
 
                 /* Search for sample in new schema */
-                destinationSqlTableReference = new TableReference(MappingToBeChecked.DestinationDatabaseName, MappingToBeChecked.DestinationSchemaName, MappingToBeChecked.DestinationTableName);
-                IDataSamplingStrategy destinationDataSampler = SequentialDataSampler.GetBoundedSequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), destinationSqlTableReference, firstRecordIdentityInSample, lastRecordIdentityInSample, srcToDestIdentityColNameMap.Values.ToList()); // sampler should be instantiated with same ordering as sourceSampler
+                destinationSqlTableReference = new SqlQueryBuilder.TableReference(MappingToBeChecked.DestinationDatabaseName, MappingToBeChecked.DestinationSchemaName, MappingToBeChecked.DestinationTableName);
+                IDataSamplingStrategy destinationDataSampler = SequentialDataSampler.GetBoundedSequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), 
+                                                                                                                        destinationSqlTableReference, 
+                                                                                                                        firstRecordIdentityInSample, 
+                                                                                                                        lastRecordIdentityInSample, 
+                                                                                                                        new List<string>() { srcToDestIdentityColNameMap[firstIdentityColName] }); // sampler should be instantiated with same ordering as sourceSampler
 
                 destinationSample = destinationDataSampler.SampleDataSource(); // sampler should query records in same order as sourceDataSampler
 
