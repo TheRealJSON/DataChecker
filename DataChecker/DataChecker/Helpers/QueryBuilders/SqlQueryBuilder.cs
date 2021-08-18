@@ -79,14 +79,45 @@ namespace DataCheckerProj.Helpers
         /// <returns>Current Class instance.</returns>
         public SqlQueryBuilder Where(Condition whereCondition)
         {
-            string joiningClause = " WHERE ";
-            if (this.SelectQuery.Contains("WHERE")) // this is not good way of doing it. What is Schema is called "WHERE"? CHANGE.
-                joiningClause = " AND ";
+            string joiningClause;
 
-            this.SelectQuery = joiningClause + " " 
-                                + this.IdentifierStart + whereCondition.ColumnName + this.IdentifierEnd
-                                + " " + whereCondition.Operation 
-                                + " " + TranslateValueToSQL(whereCondition.Value);
+            switch (whereCondition.JoiningClause)
+            {
+                case Condition.JoiningClauses.NOT_STATED:
+                    joiningClause = " WHERE ";
+                    if (this.SelectQuery.Contains("WHERE")) // this is not good way of doing it. What if Schema is called "WHERE"? CHANGE.
+                        joiningClause = " AND ";
+                    break;
+                case Condition.JoiningClauses.WHERE:
+                    joiningClause = " WHERE ";
+                    break;
+                case Condition.JoiningClauses.AND:
+                    joiningClause = " AND ";
+                    break;
+                case Condition.JoiningClauses.OR:
+                    joiningClause = " OR ";
+                    break;
+                default:
+                    joiningClause = " WHERE ";
+                    break;
+            }
+
+            string columnReference = this.IdentifierStart + whereCondition.ColumnName + this.IdentifierEnd; // make column name a literal identifier
+
+            if (whereCondition.replaceNulls == true)
+            {
+                /* 
+                    Construct SQL WERE clause but replace NULL values because sometimes they are interpreted unusually
+                    when WHERE clauses are evaluated (Postgresql)
+                 */
+                string nullReplacementValue = "'NULL'"; // replace NULL values with the text/string 'NULL'
+                string columnWithNullsReplaced = "COALESCE(" + columnReference + "," + nullReplacementValue + ")";
+                columnReference = columnWithNullsReplaced;
+            }
+
+
+            this.SelectQuery += joiningClause + " " + columnReference
+                             + " " + whereCondition.Operation + " " + TranslateValueToSQL(whereCondition.Value);
 
             return this;
         }
