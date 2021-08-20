@@ -102,18 +102,20 @@ namespace DataCheckerProj
                                                                                                                         lastRecordIdentityInSample, 
                                                                                                                         new List<string>() { identityColumnToOrderBy.DestinationColumnName }); // sampler should be instantiated with same ordering as sourceSampler
 
-                destinationSample = destinationDataSampler.SampleDataSource(); // sampler should query records in same order as sourceDataSampler
-
-                // Now we should have a sample from old/src schema and new/dest schema
-                // Both samples should share the same boundary records and therefore, due to common ordering, should share records
-                // So now lets verify no records are missing from new/dest schema
-                DataTable missingDestinationRows = DataTableHelper.GetDataTablesLeftDisjoint(sourceSample, destinationSample, new CustomDataRowComparer(srcToDestIdentityColNameMap)); //get records in sourceSample but not destinationSample
-
-                /* If there's an issue report it */
-                if (missingDestinationRows.Rows.Count > 0)
+                //destinationSample = destinationDataSampler.SampleDataSource(); // sampler should query records in same order as sourceDataSampler
+                while (destinationDataSampler.SampleDataSource().Rows.Count > 0)
                 {
-                    problemsFound = true;
-                    ReportMissingRecords(missingDestinationRows, srcIdentityColNames);
+                    // Now we should have a sample from old/src schema and new/dest schema
+                    // Both samples should share the same boundary records and therefore, due to common ordering, should share records
+                    // So now lets verify no records are missing from new/dest schema
+                    DataTable missingDestinationRows = DataTableHelper.GetDataTablesLeftDisjoint(sourceSample, destinationDataSampler.LastSampleTaken, new CustomDataRowComparer(srcToDestIdentityColNameMap)); //get records in sourceSample but not destinationSample
+
+                    /* If there's an issue report it */
+                    if (missingDestinationRows.Rows.Count > 0)
+                    {
+                        problemsFound = true;
+                        ReportMissingRecords(missingDestinationRows, srcIdentityColNames);
+                    }
                 }
             }
 
