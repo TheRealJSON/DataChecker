@@ -65,7 +65,7 @@ namespace DataCheckerProj
             Dictionary<string, string> srcToDestIdentityColNameMap = MappingToBeChecked.MappedColumns.FindAll(c => c.IsIdentityColumn) // get all identity columns
                                                                                                      .ToDictionary(c => c.SourceColumnName, c => c.DestinationColumnName); // map Source_Col_Name to Destination_Col_Name
             List<string> srcIdentityColNames = srcToDestIdentityColNameMap.Keys.ToList();
-            string firstIdentityColName = srcIdentityColNames.First(); // Note 1 identity col name for ordering results as 2 is unecessary and has potential for causing problems
+            ColumnMapping identityColumnToOrderBy = MappingToBeChecked.MappedColumns.Find(c => c.IsOrderByColumn);
 
             SqlQueryBuilder.TableReference sourceSqlTableReference;
             SqlQueryBuilder.TableReference destinationSqlTableReference;
@@ -79,7 +79,7 @@ namespace DataCheckerProj
             /* Prepare to sample old schema */
             sourceSqlTableReference = new SqlQueryBuilder.TableReference(MappingToBeChecked.SourceDatabaseName, MappingToBeChecked.SourceSchemaName, MappingToBeChecked.SourceTableName);
             List<SqlQueryBuilder.Condition> recordClassesToIgnore = GetConditionListOfClassesToIgnore();
-            IDataSamplingStrategy sourceDataSampler = new SequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), sourceSqlTableReference, recordClassesToIgnore, new List<string>() { firstIdentityColName });
+            IDataSamplingStrategy sourceDataSampler = new SequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), sourceSqlTableReference, recordClassesToIgnore, new List<string>() { identityColumnToOrderBy.SourceColumnName });
 
             while (sourceDataSampler.SampleDataSource().Rows.Count > 0) // keep sampling old schema
             {
@@ -90,9 +90,9 @@ namespace DataCheckerProj
                 lastRecordIdentityInSample = new Dictionary<string, dynamic>();
 
                 // add next column_name-to-column_value mapping for FIRST record. Use destination column name in mapping because record will be used to search destination.
-                firstRecordIdentityInSample.Add(srcToDestIdentityColNameMap[firstIdentityColName], sourceSample.Rows[0][firstIdentityColName]);
+                firstRecordIdentityInSample.Add(identityColumnToOrderBy.DestinationColumnName, sourceSample.Rows[0][identityColumnToOrderBy.SourceColumnName]);
                 // add next column_name-to-column_value mapping for LAST record. Use destination column name in mapping because record will be used to search destination. 
-                lastRecordIdentityInSample.Add(srcToDestIdentityColNameMap[firstIdentityColName], sourceSample.Rows[sourceSample.Rows.Count - 1][firstIdentityColName]);
+                lastRecordIdentityInSample.Add(identityColumnToOrderBy.DestinationColumnName, sourceSample.Rows[sourceSample.Rows.Count - 1][identityColumnToOrderBy.SourceColumnName]);
 
                 /* Search for sample in new schema */
                 destinationSqlTableReference = new SqlQueryBuilder.TableReference(MappingToBeChecked.DestinationDatabaseName, MappingToBeChecked.DestinationSchemaName, MappingToBeChecked.DestinationTableName);
@@ -100,7 +100,7 @@ namespace DataCheckerProj
                                                                                                                         destinationSqlTableReference, 
                                                                                                                         firstRecordIdentityInSample, 
                                                                                                                         lastRecordIdentityInSample, 
-                                                                                                                        new List<string>() { srcToDestIdentityColNameMap[firstIdentityColName] }); // sampler should be instantiated with same ordering as sourceSampler
+                                                                                                                        new List<string>() { identityColumnToOrderBy.DestinationColumnName }); // sampler should be instantiated with same ordering as sourceSampler
 
                 destinationSample = destinationDataSampler.SampleDataSource(); // sampler should query records in same order as sourceDataSampler
 

@@ -113,11 +113,12 @@ namespace DataCheckerProj.Mapping
                     this.DestinationTableName = row[propertyToSourceAttributeMap["DestinationTableName"]].ToString(); // unecessary to do this every iteration but nevermind
 
                     MappedColumns.Add(new ColumnMapping(Convert.ToInt32(row[propertyToSourceAttributeMap["MappingID"]]),
-                                                        row[propertyToSourceAttributeMap["SourceColumnName"]].ToString(),
+                                                        row[propertyToSourceAttributeMap["SourceColumnName"]].ToString(),  
                                                         row[propertyToSourceAttributeMap["SourceColumnType"]].ToString(),
                                                         row[propertyToSourceAttributeMap["DestinationColumnName"]].ToString(),
                                                         row[propertyToSourceAttributeMap["DestinationColumnType"]].ToString(),
-                                                        Convert.ToBoolean(row[propertyToSourceAttributeMap["IsIdentityColumn"]])));
+                                                        Convert.ToBoolean(row[propertyToSourceAttributeMap["IsIdentityColumn"]]),
+                                                        Convert.ToBoolean(row[propertyToSourceAttributeMap["IsOrderByColumn"]])));
                 }
             }
         }
@@ -153,6 +154,16 @@ namespace DataCheckerProj.Mapping
             }
 
             return isValid;
+        }
+
+        /// <summary>
+        /// Returns a text representation of the Table Mapping class that uniquely identifies it 
+        /// and can be used in a file path.
+        /// </summary>
+        /// <returns>mapping reference in a format that can be added to a file path</returns>
+        public override string ToString()
+        {
+            return this.SourceSchemaName + "-" + this.SourceTableName + "---" + this.DestinationSchemaName + "-" + this.DestinationTableName; // "-" because "." might cause issues
         }
 
         #endregion

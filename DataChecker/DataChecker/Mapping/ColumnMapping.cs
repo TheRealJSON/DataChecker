@@ -13,8 +13,9 @@ namespace DataCheckerProj.Mapping
         public string SourceColumnType { get; set; }
         public string DestinationColumnName { get; set; }
         public string DestinationColumnType { get; set; }
-        public bool IsIdentityColumn { get; set; }              // important. Used to identify mappings for a column that uniquelly identifies a data element (record)
-        public List<string> DecommissionedClasses { get; set; } // values for this column that constitute a class that should no longer be sampled
+        public bool IsIdentityColumn { get; set; }              // Important. Used to identify mappings for a column that uniquelly identifies a data element (record)
+        public bool IsOrderByColumn { get; set; }               // Used to identify mappings for the single column that should be used for ordering results and segmenting samples
+        public List<string> DecommissionedClasses { get; set; } // Values for this column that constitute a class that should no longer be sampled
         #endregion
 
         /// <summary>
@@ -29,7 +30,9 @@ namespace DataCheckerProj.Mapping
         ///     Whether or not the column mapping is for a column that, 
         ///     at least partially, uniquely identifies a data element (record)
         /// </param>
-        public ColumnMapping(int id, string srcCol, string srcType, string dstCol, string dstType, bool isIdentity)
+        /// <param name="IsOrderBy">The single column that should be used for ordering results and segmenting samples</param>
+
+        public ColumnMapping(int id, string srcCol, string srcType, string dstCol, string dstType, bool isIdentity,bool IsOrderBy)
         {
             this.MappingID = id;
             this.SourceColumnName = srcCol;
@@ -37,6 +40,7 @@ namespace DataCheckerProj.Mapping
             this.DestinationColumnName = dstCol;
             this.DestinationColumnType = dstType;
             this.IsIdentityColumn = isIdentity;
+            this.IsOrderByColumn = IsOrderBy;
             this.DecommissionedClasses = new List<string>();
         }
     }

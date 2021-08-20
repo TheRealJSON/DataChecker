@@ -304,6 +304,7 @@ namespace DataCheckerProj
             propertyToSourceAttributeMap.Add("DestinationColumnName", "DestinationColumnName");
             propertyToSourceAttributeMap.Add("DestinationColumnType", "DestinationColumnType");
             propertyToSourceAttributeMap.Add("IsIdentityColumn", "IsIdentityColumn");
+            propertyToSourceAttributeMap.Add("IsOrderByColumn", "IsOrderByColumn");
 
             return propertyToSourceAttributeMap;
         }

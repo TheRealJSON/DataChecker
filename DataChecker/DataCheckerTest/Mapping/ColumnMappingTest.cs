@@ -15,8 +15,9 @@ namespace DataCheckerTest.Mapping
             string dstCol = "destination_col";
             string dstType = "dstType";
             bool isIdentity = false;
+            bool isOrderBy = false;
 
-            ColumnMapping colMap = new ColumnMapping(mappingID, srcCol, srcType, dstCol, dstType, isIdentity);
+            ColumnMapping colMap = new ColumnMapping(mappingID, srcCol, srcType, dstCol, dstType, isIdentity, isOrderBy);
 
             Assert.AreEqual(mappingID, colMap.MappingID);
             Assert.AreEqual(srcCol, colMap.SourceColumnName);
