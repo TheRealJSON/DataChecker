@@ -71,7 +71,6 @@ namespace DataCheckerProj
             SqlQueryBuilder.TableReference destinationSqlTableReference;
 
             DataTable sourceSample;
-            DataTable destinationSample;
 
             Dictionary<string, dynamic> firstRecordIdentityInSample; // <Identity_Column_Name, Identity_Column_Value>
             Dictionary<string, dynamic> lastRecordIdentityInSample; // <Identity_Column_Name, Identity_Column_Value>
@@ -136,8 +135,8 @@ namespace DataCheckerProj
                 {                                                                   // info about decommissioned classes of record should already be populated
                     // transform current decommissioned class, as described by the TableMapping/ColumnMapping, into a Query (WHERE) Condition
                     SqlQueryBuilder.Condition whereRecordClassIsNotDecommissioned = new SqlQueryBuilder.Condition(colMap.SourceColumnName, "<>", decomissionedClass);
+
                     // add additional condition to return records when the column containing the decommissioned class IS NULL (fixes a problem with Postrgresql)
-                    //sqlConditionsForClassesToIgnore.Add(new SqlQueryBuilder.Condition(colMap.SourceColumnName, "IS", null, SqlQueryBuilder.Condition.JoiningClauses.OR));
                     if (colMap.SourceColumnType.Equals("nvarchar")) //TODO: remove hardcoded type
                     {
                         whereRecordClassIsNotDecommissioned.replaceNulls = true;
@@ -158,7 +157,6 @@ namespace DataCheckerProj
         private void ReportMissingRecords(DataTable missingDestinationRecords, List<string> sourceIdentityColNames)
         {
             string mappingBeingVerified = MappingToBeChecked.ToString();
-            string mappingInfo = mappingBeingVerified.Replace("-", ".") + " to " + MappingToBeChecked.DestinationSchemaName + "." + MappingToBeChecked.DestinationTableName;
 
             LogWriter.LogError("DataChecker.ReportMissingRecords()", mappingBeingVerified, "Records were found to be MISSING from the destination", mappingBeingVerified, LogFileFolderPath); // a line to seperate from previous executions
 
