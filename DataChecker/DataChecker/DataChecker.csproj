@@ -43,7 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataChecker.cs" />
-    <Compile Include="ErrorHandling\LogWriter.cs" />
     <Compile Include="Helpers\DataTableHelper.cs" />
     <Compile Include="Helpers\QueryBuilders\PostgreSqlQueryBuilder.cs" />
     <Compile Include="Helpers\QueryBuilders\SqlQueryBuilder.cs" />
