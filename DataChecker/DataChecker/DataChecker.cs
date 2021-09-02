@@ -30,12 +30,12 @@ namespace DataCheckerProj
         /// <summary>
         /// The table for inserting log information into
         /// </summary>
-        private SqlQueryBuilder.TableReference LogTableReference;
+        private readonly SqlQueryBuilder.TableReference LogTableReference;
 
         /// <summary>
         /// The connection for the database that contains the log table
         /// </summary>
-        private SqlConnection LogTableConnection;
+        private readonly SqlConnection LogTableConnection;
 
         #endregion
 
@@ -163,8 +163,6 @@ namespace DataCheckerProj
         {
             if (this.LogTableConnection.State != ConnectionState.Open)
                 this.LogTableConnection.Open();
-
-            string mappingBeingVerified = MappingToBeChecked.ToString();
 
             /* Construct columns used by log table */
             string uniquePrefix = "DataChecker";
