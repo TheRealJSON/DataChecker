@@ -1,7 +1,6 @@
 ﻿using DataCheckerProj.Helpers;
 using DataCheckerProj.Importers;
 using DataCheckerProj.Mapping;
-using DataCheckerProj.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,6 +8,7 @@ using System.Data.SqlClient;
 using static DataCheckerProj.Helpers.SqlQueryBuilder;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using DataCheckerProj; // needed for SSIS package
 
 namespace DataCheckerProj
 {
@@ -16,9 +16,9 @@ namespace DataCheckerProj
     {
         private static string PostgresqlConnectionString;               // used for reading data to verify
         private static string SqlServerConnectionString;                // used to read configuration data
-        private static string LogFileFolderPath;                        // used for reporting
         private static TableReference MappingDataSource;                // the SQL table containing schema mapping information
         private static TableReference DecommissionedClassesDataSource;  // the SQL table containing information about record classes that have been removed from future datasets
+        private static TableReference LogTableReference;                // the SQL table to write log info to
         private static bool ParametersLoaded = false;                   // whether or not all parameters have been loaded without error
 
         private static List<TableMapping> TableMappingList = new List<TableMapping>(); // list of schema mapping information used for processing
@@ -35,16 +35,19 @@ namespace DataCheckerProj
 
                     try
                     {
-                        DataChecker checker = new DataChecker(tableMappingToVerify, PostgresqlConnectionString, LogFileFolderPath); // this class uses passed mapping info to cross-verify data between schemas
+                        using (SqlConnection logConnection = new SqlConnection(SqlServerConnectionString))
+                        {
+                            DataChecker checker = new DataChecker(tableMappingToVerify, PostgresqlConnectionString, LogTableReference, logConnection); // this class uses passed mapping info to cross-verify data between schemas
 
-                        bool problemsFound = checker.VerifyDataMatchesBetweenSourceAndDestination(); // verifies no data elements are missing between source and destination schema
+                            bool problemsFound = checker.VerifyDataMatchesBetweenSourceAndDestination(); // verifies no data elements are missing between source and destination schema
 
-                        if (problemsFound) // specifics of problems should be reported by checker class
-                            Dts.Events.FireError(0, "Main(string[] args)", "Process found discrepencies between source and destination data for source table " + mappingBeingVerified, String.Empty, 0);
+                            if (problemsFound) // specifics of problems should be reported by checker class
+                                Dts.Events.FireError(0, "Main(string[] args)", "Process found discrepencies between source and destination data for source table " + mappingBeingVerified, String.Empty, 0);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        LogWriter.LogError("Main(string[] args)", mappingBeingVerified, ex.ToString(), "no data description available", LogFileFolderPath); // can use LogWriter because initialisationSuccess=true :D
+                        Dts.Events.FireError(0, "Main(string[] args)", ex.ToString(), String.Empty, 0);
                     }
                 }); // End of parallel foreach
             }
@@ -111,8 +114,6 @@ namespace DataCheckerProj
             {
                 List<string> invalidParameters = new List<string>();
 
-                LogFileFolderPath = GetAndValidateStringParameter("Log_File_Folder_Path", ref invalidParameters);
-
                 string dataSourceDatabase = GetAndValidateStringParameter("Decommissioned_Classes_Source__Database", ref invalidParameters);
                 string dataSourceSchema = GetAndValidateStringParameter("Decommissioned_Classes_Source__Schema", ref invalidParameters);
                 string dataSourceTable = GetAndValidateStringParameter("Decommissioned_Classes_Source__Table", ref invalidParameters);
@@ -123,8 +124,17 @@ namespace DataCheckerProj
                 dataSourceTable = GetAndValidateStringParameter("Mapping_Data_Source__Table", ref invalidParameters);
                 MappingDataSource = new TableReference(dataSourceDatabase, dataSourceSchema, dataSourceTable);
 
-                PostgresqlConnectionString = GetAndValidateStringParameter("Postgresql_Connection_String", ref invalidParameters);
-                SqlServerConnectionString = GetAndValidateStringParameter("SqlServer_Connection_String", ref invalidParameters);
+                dataSourceDatabase = GetAndValidateStringParameter("Log_Table__Database", ref invalidParameters);
+                dataSourceSchema = GetAndValidateStringParameter("Log_Table__Schema", ref invalidParameters);
+                dataSourceTable = GetAndValidateStringParameter("Log_Table__Table", ref invalidParameters);
+                LogTableReference = new TableReference(dataSourceDatabase, dataSourceSchema, dataSourceTable);
+
+                PostgresqlConnectionString = Dts.Connections["Postgresql_Connection"].ConnectionString;
+                SqlServerConnectionString = Dts.Connections["SQL_Server_Connection"].ConnectionString;
+                var b = new System.Data.OleDb.OleDbConnectionStringBuilder(SqlServerConnectionString);
+                b.Remove("provider");
+                b.Remove("auto translate");
+                SqlServerConnectionString = b.ConnectionString;
 
                 if (invalidParameters.Count > 0)
                 {
@@ -374,6 +384,7 @@ namespace DataCheckerProj
         public class Dts // Only here for code outside of SSIS solution. Remove when deploying to package. Testing purposes.
         {
             public static Dictionary<string, ValueObject> Variables = new Dictionary<string, ValueObject>();
+            public static Dictionary<string, conn> Connections = new Dictionary<string, conn> ();
 
             public static void BootstrapFakeDtsClass()
             {
@@ -384,10 +395,20 @@ namespace DataCheckerProj
                 Variables.Add("Mapping_Data_Source__Schema", new ValueObject("DataChecker"));
                 Variables.Add("Mapping_Data_Source__Table", new ValueObject("Table_Mapping"));
                 Variables.Add("Log_File_Folder_Path", new ValueObject(@"C:\Users\Jaso\source\DataChecker\DataChecker\bin\logs\"));
-                Variables.Add("Postgresql_Connection_String", new ValueObject("Dsn=PostgreSQL35W;"));
-                Variables.Add("SqlServer_Connection_String", new ValueObject("Data Source=DESKTOP-LMMBET3;Initial Catalog=master;Integrated Security=True;"));
+ 
+                Connections["Postgresql_Connection"] = new conn("Dsn = PostgreSQL35W;");
+                Connections["SQL_Server_Connection"] = new conn("Data Source = DESKTOP - LMMBET3; Initial Catalog = master; Integrated Security = True;");
             }
 
+            public class conn
+            {
+                public string ConnectionString;
+                public conn (string conStr)
+                {
+                    this.ConnectionString = conStr;
+                }
+            }
+            
             public class ValueObject
             {
                 public dynamic Value;

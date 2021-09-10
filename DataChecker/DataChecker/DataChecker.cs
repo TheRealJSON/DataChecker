@@ -1,13 +1,12 @@
-﻿using DataCheckerProj.ErrorHandling;
-using DataCheckerProj.Helpers;
+﻿using DataCheckerProj.Helpers;
 using DataCheckerProj.Mapping;
 using DataCheckerProj.Sampling;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
+using System.Data.SqlClient;
 using System.Linq;
-using static DataCheckerProj.Helpers.SqlQueryBuilder;
 
 namespace DataCheckerProj
 {
@@ -29,9 +28,14 @@ namespace DataCheckerProj
         private TableMapping MappingToBeChecked;
 
         /// <summary>
-        /// The path of the windows folder that contains, or will contain, log files and output
+        /// The table for inserting log information into
         /// </summary>
-        private string LogFileFolderPath;
+        private readonly SqlQueryBuilder.TableReference LogTableReference;
+
+        /// <summary>
+        /// The connection for the database that contains the log table
+        /// </summary>
+        private readonly SqlConnection LogTableConnection;
 
         #endregion
 
@@ -42,11 +46,12 @@ namespace DataCheckerProj
             this.MappingToBeChecked = null;
         }
 
-        public DataChecker(TableMapping tableToBeChecked, string dataSourceConnectionString, string logFileFolderPath)
+        public DataChecker(TableMapping tableToBeChecked, string dataSourceConnectionString, SqlQueryBuilder.TableReference logTable, SqlConnection sqlConn)
         {
             this.MappingToBeChecked = tableToBeChecked;
             this.DataSourceConnectionString = dataSourceConnectionString;
-            this.LogFileFolderPath = logFileFolderPath;
+            this.LogTableReference = logTable;
+            this.LogTableConnection = sqlConn;
         }
 
         #endregion
@@ -95,10 +100,10 @@ namespace DataCheckerProj
 
                 /* Search for sample in new schema */
                 destinationSqlTableReference = new SqlQueryBuilder.TableReference(MappingToBeChecked.DestinationDatabaseName, MappingToBeChecked.DestinationSchemaName, MappingToBeChecked.DestinationTableName);
-                IDataSamplingStrategy destinationDataSampler = SequentialDataSampler.GetBoundedSequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString), 
-                                                                                                                        destinationSqlTableReference, 
-                                                                                                                        firstRecordIdentityInSample, 
-                                                                                                                        lastRecordIdentityInSample, 
+                IDataSamplingStrategy destinationDataSampler = SequentialDataSampler.GetBoundedSequentialDataSampler(new OdbcConnection(this.DataSourceConnectionString),
+                                                                                                                        destinationSqlTableReference,
+                                                                                                                        firstRecordIdentityInSample,
+                                                                                                                        lastRecordIdentityInSample,
                                                                                                                         new List<string>() { identityColumnToOrderBy.DestinationColumnName }); // sampler should be instantiated with same ordering as sourceSampler
 
                 //destinationSample = destinationDataSampler.SampleDataSource(); // sampler should query records in same order as sourceDataSampler
@@ -156,20 +161,68 @@ namespace DataCheckerProj
         /// <param name="sourceIdentityColNames">The names of the identity columns in the context of the source table</param>
         private void ReportMissingRecords(DataTable missingDestinationRecords, List<string> sourceIdentityColNames)
         {
-            string mappingBeingVerified = MappingToBeChecked.ToString();
+            if (this.LogTableConnection.State != ConnectionState.Open)
+                this.LogTableConnection.Open();
 
-            LogWriter.LogError("DataChecker.ReportMissingRecords()", mappingBeingVerified, "Records were found to be MISSING from the destination", mappingBeingVerified, LogFileFolderPath); // a line to seperate from previous executions
+            /* Construct columns used by log table */
+            string uniquePrefix = "DataChecker";
+            string srcSchemaColumnName = uniquePrefix + "_src_schema"; // prefix all cols with DataChecker to prevent overlap with existing columns
+            string srcTableColumnName = uniquePrefix + "_src_table";
+            string dstSchemaColumnName = uniquePrefix + "_dst_schema";
+            string dstTableColumnName = uniquePrefix + "_dst_table";
+            string messageTypeColumnName = uniquePrefix + "_message_type";
+            string messageColumnName = uniquePrefix + "_Record_Identity";
 
-            foreach (DataRow row in missingDestinationRecords.Rows)
+            missingDestinationRecords.Columns.Add(srcSchemaColumnName, typeof(string));
+            missingDestinationRecords.Columns.Add(srcTableColumnName, typeof(string));
+            missingDestinationRecords.Columns.Add(dstSchemaColumnName, typeof(string));
+            missingDestinationRecords.Columns.Add(dstTableColumnName, typeof(string));
+            missingDestinationRecords.Columns.Add(messageTypeColumnName, typeof(string));
+            missingDestinationRecords.Columns.Add(messageColumnName, typeof(string));
+
+            for (int i = 0; i < missingDestinationRecords.Rows.Count; i++) // loop over rows and set the columns used by log table
             {
                 string recordIdentity = "";
+
+                // convert identity of current record into text message
                 foreach (string srcIdentityColumn in sourceIdentityColNames)
                 {
-                    recordIdentity += srcIdentityColumn + ":= " + row[srcIdentityColumn].ToString() + " ; ";
+                    recordIdentity += srcIdentityColumn + ":= " + missingDestinationRecords.Rows[i][srcIdentityColumn].ToString() + " ; ";
                 }
 
-                LogWriter.LogError("DataChecker.ReportMissingRecords()", mappingBeingVerified, "record missing from destination", recordIdentity, LogFileFolderPath);
+                missingDestinationRecords.Rows[i][srcSchemaColumnName] = this.MappingToBeChecked.SourceSchemaName;
+                missingDestinationRecords.Rows[i][srcTableColumnName] = this.MappingToBeChecked.SourceTableName;
+                missingDestinationRecords.Rows[i][dstSchemaColumnName] = this.MappingToBeChecked.DestinationSchemaName;
+                missingDestinationRecords.Rows[i][dstTableColumnName] = this.MappingToBeChecked.DestinationTableName;
+                missingDestinationRecords.Rows[i][messageTypeColumnName] = "missing_record";
+                missingDestinationRecords.Rows[i][messageColumnName] = recordIdentity;
             }
+
+            /* Remove all columns except columns used by log table */
+            for (int i = 0; i < missingDestinationRecords.Columns.Count; i++)
+            {
+                if (missingDestinationRecords.Columns[i].ColumnName.Contains(uniquePrefix) == false) // if column is not one added by this method
+                {
+                    missingDestinationRecords.Columns.RemoveAt(i);
+                }
+            }
+
+            using (SqlBulkCopy bulkCopy = new SqlBulkCopy(this.LogTableConnection))
+            {
+                bulkCopy.ColumnMappings.Add(srcSchemaColumnName, "src_schema");
+                bulkCopy.ColumnMappings.Add(srcTableColumnName, "src_table");
+                bulkCopy.ColumnMappings.Add(dstSchemaColumnName, "dst_schema");
+                bulkCopy.ColumnMappings.Add(dstTableColumnName, "dst_table");
+                bulkCopy.ColumnMappings.Add(messageTypeColumnName, "message_type");
+                bulkCopy.ColumnMappings.Add(messageColumnName, "message");
+
+                bulkCopy.BulkCopyTimeout = 600;
+                bulkCopy.DestinationTableName = string.Format("[{0}].[{1}].[{2}]", LogTableReference.DatabaseName,
+                                                                                    LogTableReference.SchemaName,
+                                                                                    LogTableReference.TableName);
+                bulkCopy.WriteToServer(missingDestinationRecords);
+            }
+            /* Write missing records to log table */
         }
 
         #endregion
