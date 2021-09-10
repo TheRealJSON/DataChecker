@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataChecker", "DataChecker\DataChecker.csproj", "{86EC46C0-3E55-428D-A90B-EC0B948CF649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCheckerTest", "DataCheckerTest\DataCheckerTest.csproj", "{B098501C-C0A0-44C7-9017-F4720A45A54E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{86EC46C0-3E55-428D-A90B-EC0B948CF649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86EC46C0-3E55-428D-A90B-EC0B948CF649}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86EC46C0-3E55-428D-A90B-EC0B948CF649}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86EC46C0-3E55-428D-A90B-EC0B948CF649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B098501C-C0A0-44C7-9017-F4720A45A54E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B098501C-C0A0-44C7-9017-F4720A45A54E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B098501C-C0A0-44C7-9017-F4720A45A54E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B098501C-C0A0-44C7-9017-F4720A45A54E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAD95C5C-5454-4733-BC5B-33BD97245BEE}
+	EndGlobalSection
+EndGlobal
